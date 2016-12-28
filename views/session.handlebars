@@ -125,7 +125,6 @@
   $('#fileupload').fileupload({
       dataType: 'json',
       add: function(e, data) {
-        console.log(data)
         data.files.map(function(file) {
           uploading_files.push({
             uploading: true,
