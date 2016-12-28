@@ -1,0 +1,21 @@
+{
+  "name": "sharedbuffer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "delete": "^0.3.2",
+    "express": "^4.14.0",
+    "express-handlebars": "^3.0.0",
+    "md5": "^2.2.1",
+    "mongoose": "^4.7.3",
+    "multer": "^1.2.1"
+  }
+}

@@ -1,0 +1,165 @@
+<div style="overflow: hidden;">
+  <p class="top-instruction">
+    <i class="fa fa-check-circle" aria-hidden="true"></i> <strong>Connected</strong>. Text that you type or paste in the field below is synchronized across all devices where <a href="https://buffr.io/{{id}}">buffr.io/{{id}}</a> is opened.</p>
+  <div id="text-clipboard" contenteditable="true" tabindex="0"></div>
+  <div class="bottom-instruction">
+    <div class="col-sm-6 col-xs-12" style="padding: 0;">
+      <div>Share files:</div>
+      <input id="fileupload" type="file" name="file">
+      <label for="fileupload" class="file-instruction">
+        <i class="fa fa-file" aria-hidden="true"></i> drag file / click here to upload
+      </label>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xs-12 shared-files-wrap">
+    <div>Shared files:</div>
+    <div class="shared-files"></div>
+  </div>
+</div>
+
+<div class="destroy-instruction">
+  The link, the note content and all uploaded files will be destroyed after 1 hour. Alternatively, you can <a href="#" id="destroy-session-link">destroy session now</a>.
+</div>
+
+<a id="download-link">Download link!</a>
+
+<script type="text/javascript">
+  var session_id = '{{id}}'
+  var poll_delay = 1000
+  var poll_locked = false
+  var keyboard_debounce = 1000
+  var letgo = false
+
+  var uploading_files = []
+  var server_files = []
+  let fileupload_lock = false
+
+  $('#text-clipboard').on('keyup', function() { poll_locked = true })
+  $('#text-clipboard').on('input', debounce(push, keyboard_debounce))
+
+  $('#destroy-session-link').on('click', function() {
+    letgo = true
+    destroy_session()
+  })
+
+  $('.file-instruction').on('click drop', function(event) {
+    if(fileupload_lock) {
+      event.preventDefault()
+      return false
+    }
+  })
+
+  function poll() {
+    if(poll_locked) {
+      return setTimeout(poll, poll_delay)
+    }
+    $.get('/api/' + session_id, function(data) {
+      if(data.error) {
+        letgo = true
+        window.location.href = '/expired'
+      }
+      if(data.textData !== $('#text-clipboard').html()) {
+        $('#text-clipboard').html(data.textData)
+      }
+      server_files = data.files
+      should_render_files()
+      setTimeout(poll, poll_delay)
+    })
+  }
+
+  function render_files(files) {
+    return files.reduce(function(html, file) {
+      if(file.uploading) {
+        html += `
+          <div class="shared-file shared-file-uploading">
+            <i class="fa fa-spinner fa-pulse fa-fw"></i> ${file.name}
+          </div>
+        `
+      } else {
+        html += `<a class="shared-file" href="/api/${session_id}/file/${file.id}"
+          download="${file.name}">${file.name}</a>`
+      }
+      return html
+    }, '')
+  }
+
+  function should_render_files() {
+    let files_html = render_files(uploading_files.concat(server_files))
+    if($('.shared-files').html() !== files_html) {
+      $('.shared-files').html(files_html)
+    }
+  }
+
+  function push() {
+    $.ajax({
+      url: '/api/' + session_id,
+      method: 'PUT',
+      data: {
+        textData: $('#text-clipboard').html()
+      }
+    }).always(function() {
+      poll_locked = false
+    })
+  }
+
+  function debounce(fn, delay) {
+    var timer = null;
+    return function () {
+      var context = this, args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        fn.apply(context, args);
+      }, delay);
+    };
+  }
+
+  function destroy_session() {
+    $.ajax({
+      url: '/api/' + session_id,
+      method: 'DELETE'
+    }).always(function() {
+      window.location.href = '/destroyed'
+    })
+  }
+
+  $('#fileupload').fileupload({
+      dataType: 'json',
+      add: function(e, data) {
+        console.log(data)
+        data.files.map(function(file) {
+          uploading_files.push({
+            uploading: true,
+            name: file.name,
+            type: file.type,
+            file: file.size
+          })
+          should_render_files()
+        })
+        fileupload_lock = true
+        data.submit().complete(function() {
+          fileupload_lock = false
+          $('.shared-file-uploading').hide(100).remove()
+          uploading_files = []
+        })
+      },
+      url: '/api/' + session_id + '/file',
+      dropZone: $('.file-instruction'),
+      sequentialUploads: true,
+  })
+
+  window.onbeforeunload = function(evt) {
+    if(!letgo) {
+      var message = 'Are you sure you want to exit?'
+      if (typeof evt == 'undefined') {
+        evt = window.event
+      }
+      if (evt) {
+        evt.returnValue = message;
+      }
+      return message;
+    }
+  }
+
+  poll()
+
+</script>

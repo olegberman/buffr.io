@@ -1,0 +1,81 @@
+<div class="text-center max-width center-block">
+  <h2>Realtime web clipboard and file transfer</h2>
+  {{#if destroyed}}
+    <div class="alert alert-dismissible alert-success">
+      <strong>Well done!</strong> Session, URL and your data has been destroyed. Thank you for using buffr.io!
+    </div>
+  {{/if}}
+  {{#if expired}}
+    <div class="alert alert-dismissible alert-warning">
+      <strong>Oops.</strong> It looks like your session has expired.
+    </div>
+  {{/if}}
+
+  <div style="margin: 25px auto; margin-top: 35px;">
+    Have a synchronized text and file clipboard available under a unique link.
+    This is a perfect tool if your remote desktop application does not support <b>shared clipboard</b> but you copy often.
+  </div>
+
+  <div class="session-button-wrap">
+    <button class="btn btn-primary center-block" id="session-button">Start session</button>
+  </div>
+  <div class="link-wrap center-block" style="display: none;">
+    <div class="text-center">
+      <b>Done! The session will start and you will be redirected once you open the link on the second device.</b>
+    </div>
+    <div style="margin-top: 15px;">
+      <input type="text" class="form-control" id="link" />
+      <button class="btn btn-info" id="copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+  function disable_copy_button() {
+    $('#copy').removeClass('btn-info').addClass('btn-default').attr('disabled', 'true')
+  }
+
+  function success_copy_button() {
+    $('#copy').removeClass('btn-info').addClass('btn-success').text('Copied!')
+  }
+
+  $('#copy').on('click', function() {
+    $('#link').select()
+    try {
+      var copied = document.execCommand('copy')
+      if(copied) {
+        success_copy_button()
+      } else {
+        disable_copy_button()
+        $('#copy').off('click')
+      }
+    } catch (err) {
+      disable_copy_button()
+      $('#copy').off('click')
+    }
+  })
+
+  $('#session-button').on('click', function() {
+    $('#session-button').attr('disabled', 'true').text('Working...')
+    $.post('/api/start', function(data) {
+      if(data) {
+        $('#link').val('https://' + window.location.host + '/' + data.id)
+        $('.link-wrap').fadeIn('100')
+        $('#session-button').attr('disabled', 'true').text('Copy the link below')
+        is_connection_established(data.id)
+      }
+    })
+  })
+
+  var is_connection_established = function(id) {
+    $.get('/api/' + id, function(data) {
+      if(data.ready) {
+        window.location.href = '/' + id
+      } else {
+        setTimeout(is_connection_established.bind('no context', id), 3000)
+      }
+    })
+  }
+</script>

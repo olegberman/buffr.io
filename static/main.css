@@ -1,0 +1,174 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  font-family: 'Lato', sans-serif;
+}
+
+#app {
+  padding: 10px;
+}
+
+.session-button-wrap {
+  padding: 20px 0;
+}
+
+.link-wrap {
+  padding: 15px 0;
+  max-width: 450px;
+}
+
+.link-wrap input {
+  float: left;
+  width: 80%;
+}
+
+.link-wrap button {
+  float: right;
+  width: 20%;
+}
+
+#text-clipboard {
+  font-size: 13px;
+  padding: 8px;
+  height: 350px;
+  overflow: auto;
+  text-align: left;
+  cursor: text;
+  border: 2px solid #ddd;
+  outline: none;
+  overflow: auto;
+  letter-spacing: 1px;
+}
+
+#text-clipboard:focus {
+  border: 2px solid #ccc;
+}
+
+.green-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: mediumspringgreen;
+  display: inline-block;
+}
+
+.file-row {
+  border-bottom: 1px solid #ddd;
+  margin: 10px;
+}
+
+.dz-default {
+  display: block;
+  text-align: center;
+  margin: 10px 0;
+  padding: 20px;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+}
+
+#download-link {
+  display: none;
+}
+
+#destroy-session-link {
+  color: red;
+}
+
+.bottom-instruction {
+  padding-top: 0px;
+  margin-top: 10px;
+}
+
+
+.file-instruction {
+  font-size: 20px;
+  text-align: center;
+  color: rgba(44, 44, 44, 0.5);
+  background-color: rgba(0, 0, 0, 0.035);
+  padding-top: 25px;
+  padding-bottom: 27px;
+  transition: all .1s ease;
+  cursor: pointer;
+  display: block;
+  height: 80px;
+}
+
+.file-instruction:hover {
+  background-color: rgba(0, 0, 0, 0.055);
+  color: rgba(44, 44, 44, 0.7);
+}
+
+.destroy-instruction {
+  padding-top: 35px;
+  text-align: center;
+}
+
+#fileupload {
+  width: 1px;
+  height: 1px;
+  outline: none !important;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+header img {
+  position: relative;
+  left: 7px;
+  transition: all .1s ease;
+}
+
+header img:hover {
+  transform: scale(1.05)
+}
+
+.fa-check-circle {
+  color: #00a70c;
+}
+
+.max-width {
+  max-width: 620px;
+}
+
+footer {
+  padding: 30px;
+  font-size: 11px;
+  color: #ccc;
+  text-align: center;
+}
+
+.shared-files {
+  height: 79px;
+  border: 1px solid #ddd;
+  margin-top: 1px;
+  overflow: auto;
+}
+
+.shared-file {
+  display: inline-block;
+  padding: 2px 4px;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+  margin: 2px 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.shared-file:hover {
+  background-color: #ddd;
+}
+
+.shared-files-wrap {
+  padding:0;
+  padding-left: 10px;
+}
+
+@media(max-width: 767px) {
+  .shared-files-wrap {
+    padding-left: 0 !important;
+  }
+}
